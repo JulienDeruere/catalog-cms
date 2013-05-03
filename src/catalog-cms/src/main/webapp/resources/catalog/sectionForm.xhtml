@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite">
+
+<cc:interface>
+	<cc:attribute name="widgetVar" required="true" />
+	<cc:attribute name="header" />
+	<cc:attribute name="addForm" type="java.lang.Boolean" />
+</cc:interface>
+
+<cc:implementation>
+<p:dialog widgetVar="#{cc.attrs.widgetVar}" header="#{cc.attrs.header}" showEffect="fade" resizable="false" modal="true">
+	<h:form id="#{cc.id}" enctype="multipart/form-data">  
+		<p:panelGrid>
+			<p:row>
+				<p:column colspan="2">
+					<h:outputLabel for="name" value="Name" style="margin-right: 10px;" />
+					<p:inputText id="name" value="#{sectionForm.section.name}" size="80" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column style="width:100px">
+					<div style="width:100px;height:100px;border-style: dotted;">
+						<p:graphicImage id="sectionIcon" value="#{sectionForm.imageContent}" width="100px" height="100px" />
+					</div>
+					
+					<p:overlayPanel for="sectionIcon" showEffect="blind" hideEffect="explode" showEvent="click" hideEvent="click" styleClass="ui-helper-clearfix" dynamic="true" appendToBody="true">  
+				        <p:graphicImage id="sectionImage" value="#{sectionForm.imageContent}" />
+				    </p:overlayPanel>
+				</p:column>
+				<p:column>
+					<p:fileUpload id="image" fileUploadListener="#{sectionForm.handleFileUpload}" mode="advanced" auto="true" label="#{msg['image.choose']}"
+						update="imageHidden,msg,sectionIcon" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" sizeLimit="512000" />
+					<h:inputHidden id="imageHidden" value="#{sectionForm.section.image.extention}" />
+					<p:growl id="msg" life="2000" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="2">
+					<p:fieldset legend="#{msg['description.title.desciption_list']}" style="margin-bottom: 5px;">
+						<p:dataList id="description_list" value="#{valueForm.descriptions}" var="desc">
+							<p:column>
+								#{desc.value.key} - #{desc.description}
+							</p:column>
+						</p:dataList>
+					</p:fieldset>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="2">
+					<p:fieldset legend="#{msg['value.add_value']}">
+						<h:panelGrid columns="2">
+							<h:outputLabel for="key" value="#{msg['value.key']}" />
+							<h:panelGrid columns="2">
+								<p:selectOneMenu id="key" value="#{valueForm.selectedValue}" var="val" converter="value" editable="true" required="true" requiredMessage="#{vld['value.key.not_empty']}" style="width: 150px">
+            						<f:selectItems value="#{valueForm.values}" var="v" itemValue="#{v}" itemLabel="#{v.key}" />
+            						<p:ajax event="change" listener="#{valueForm.handleSelect}" update="description" />
+	           						<p:column>
+										#{val.key}
+									</p:column>
+								</p:selectOneMenu>
+								<p:commandButton title="#{msg.add}" action="#{valueForm.add(catalogTreeTable.root.data)}" process="@this,key,description" 
+									update="key,description,description_list" style="margin-left: 10px;" icon="ui-icon-plus" />
+							</h:panelGrid>
+							<h:outputLabel for="description" value="#{msg['description.label']}" />
+							<p:inputTextarea id="description" value="#{valueForm.description}" cols="60" required="true" requiredMessage="#{vld['value.description.not_empty']}" />
+						</h:panelGrid>
+					</p:fieldset>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="2">
+					<p:commandButton value="#{msg.add}" action="#{sectionForm.add(catalogTreeTable.root.data, valueForm.descriptions)}" oncomplete="#{cc.id}_handleSectionValidation(xhr, status, args)" process="@this,name,imageHidden,description_list"
+						update="@form,:catalog_form" rendered="#{cc.attrs.addForm}" />
+					<p:commandButton value="#{msg.edit}" action="#{sectionForm.edit(valueForm.descriptions)}" oncomplete="#{cc.id}_handleSectionValidation(xhr, status, args)" process="@this,name,imageHidden,description_list"
+						update="@form,:catalog_form" rendered="#{!cc.attrs.addForm}" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+	</h:form>
+</p:dialog>
+
+<script type="text/javascript">  
+    function #{cc.id}_handleSectionValidation(xhr, status, args) {  
+        if(!args.validationFailed) {  
+        	#{cc.attrs.widgetVar}.hide();  
+        }  
+    }  
+</script> 
+</cc:implementation>
+</html>

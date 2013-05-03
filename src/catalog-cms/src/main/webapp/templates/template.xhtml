@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ft="http://primefaces.prime.com.tr/facestrace">
+
+	<h:head>
+	    <title><ui:define name="title">Catalog CMS</ui:define></title>
+	    <meta http-equiv="content-type" content="text/xhtml; charset=UTF-8" />
+	    <h:outputStylesheet library="css" name="template.css" />
+	    <h:outputStylesheet library="css" name="components.css" />
+	</h:head>
+
+	<h:body>	
+		<ui:include src="/templates/menu.xhtml" />	
+
+		<div id="container">
+	    	<ui:insert name="body" />
+	    </div>
+	</h:body>
+	<!--<ft:trace />-->
+	<!-- <p:log /> -->
+</html>

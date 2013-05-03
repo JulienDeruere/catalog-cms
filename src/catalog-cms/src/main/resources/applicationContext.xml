@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:property-placeholder location="classpath:jdbc-dev.properties" />
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="${jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.user}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="acquireIncrement" value="1" />
+		<property name="minPoolSize" value="5" />
+		<property name="maxPoolSize" value="15" />
+		<property name="acquireRetryAttempts" value="10" />
+		<property name="preferredTestQuery" value="SELECT 1" />
+		<property name="testConnectionOnCheckin" value="true" />
+		<property name="testConnectionOnCheckout" value="false" />
+		<property name="maxIdleTime" value="50" />
+		<property name="idleConnectionTestPeriod" value="1000" />
+	</bean>
+
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceUnitName" value="CatalogCMSPU" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<context:annotation-config />
+	<tx:annotation-driven transaction-manager="txManager" />
+	
+	<context:component-scan base-package="com.catalog.dao.impl" />
+	<context:component-scan base-package="com.catalog.services.impl" />
+</beans>

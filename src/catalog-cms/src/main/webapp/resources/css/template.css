@@ -1,0 +1,65 @@
+body {
+	margin: 0;
+	padding: 0;
+	background: url("/CATALOGCMS/faces/javax.faces.resource/images/ui-bg_highlight-hard_100_f2f5f7_1x100.png?ln=primefaces-cupertino") repeat-x scroll 50% top #F2F5F7;
+}
+
+#container {
+	width: 90%;
+	margin: 0 auto;
+}
+
+.logo {
+	float: left;
+	height: 49px;
+	margin: 0;
+	padding-top: 12px;
+	overflow: hidden;
+	font: bold 22px "Trebuchet MS", "Times New Roman", Times, serif;
+	width: 175px;
+}
+
+.logo a {
+	color: #F9F7F7;
+    text-decoration: none;
+}
+
+#header {
+	background: none repeat scroll 0 0 #424548;
+	border-bottom: 1px solid #56585C;
+	width: 100%;
+	margin-bottom: 20px;
+}
+
+.header-block:after {
+	clear: both;
+	content: "";
+	display: block;
+}
+
+.header-block {
+	height: 49px;
+	margin: 0 auto;
+	width: 998px;
+}
+
+#nav {
+	float: right;
+	font: bold 14px/18px "Trebuchet MS", "Times New Roman", Times, serif;
+	list-style: none outside none;
+	margin: 0;
+	padding: 21px 18px 0 0;
+}
+
+#nav li {
+	float: left;
+	margin: 0 0 0 40px;
+	position: relative;
+}
+
+#nav a {
+	color: #F9F7F7;
+	display: block;
+	padding: 0 14px 0 0;
+	text-decoration: none;
+}

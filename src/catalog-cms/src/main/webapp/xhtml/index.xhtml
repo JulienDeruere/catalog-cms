@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsf/composite/catalog">
+
+<ui:composition template="/templates/template.xhtml">
+
+	<ui:define name="title">
+		<h:outputText value="#{msg.home.title}" />
+	</ui:define>
+
+	<ui:define name="body">
+	
+		<p:growl autoUpdate="true" life="2000" />
+	
+		<p:layout style="min-width:400px;min-height:500px;">
+
+			<p:layoutUnit position="west">  
+				<p:fieldset legend="#{msg['home.title.add_catalog']}" style="margin-bottom: 5px;">
+					<h:form>
+						<h:panelGrid columns="3">
+							<h:outputLabel for="name" value="Nom du catalogue" />
+							<p:inputText id="name" value="#{catalogForm.catalog.name}" />
+							<p:commandButton value="#{msg.add}" action="#{catalogForm.add}" update="@parent,:catalog_list_form" />
+						</h:panelGrid>
+					</h:form>
+				</p:fieldset>
+		
+				<p:fieldset legend="#{msg['home.title.catalog_list']}">
+					<h:form id="catalog_list_form">
+						<p:dataList value="#{catalogList.catalogs}" var="cat">
+							<p:column>
+								<p:commandLink action="#{catalogTreeTable.choose(cat)}" value="#{cat.name}" ajax="false" />
+							</p:column>
+						</p:dataList>
+					</h:form>
+				</p:fieldset>
+			</p:layoutUnit> 
+		  
+	        <p:layoutUnit position="center">
+				
+				<h:outputText value="#{msg['choose.catalog']}" rendered="#{empty catalogTreeTable.root}" />
+				
+				<h:form id="catalog_form">
+			   		<p:contextMenu id="section_menu" for="sections" nodeType="section">
+				        <p:menuitem value="#{msg.edit}" oncomplete="editSectionDialog.show()" action="#{valueForm.init(catalogTreeTable.root.data, sectionForm.section)}" 
+				        	update=":edit_section_form:edit_section_form" icon="ui-icon-search">  
+				       		<f:setPropertyActionListener target="#{sectionForm.section}" value="#{catalogTreeTable.selectedNode.data}" />
+				        </p:menuitem>
+				        <p:menuitem value="#{msg['section.add_item']}" oncomplete="addItemDialog.show()" action="#{valueForm.init(catalogTreeTable.root.data)}"
+				        	 actionListener="#{itemForm.init}" update=":add_item_form:add_item_form" icon="ui-icon-close" />
+				        <p:menuitem value="#{msg['item.paste']}" actionListener="#{catalogTreeTable.pasteItem}" update="sections" rendered="#{catalogTreeTable.copyItem != null}" icon="ui-icon-close" />
+				        <p:menuitem value="#{msg.delete}" actionListener="#{catalogTreeTable.deleteSectionNode}" update="sections" icon="ui-icon-close" />
+				    </p:contextMenu>
+
+				    <p:contextMenu for="sections" nodeType="item">
+				        <p:menuitem value="#{msg.edit}" oncomplete="editItemDialog.show()" action="#{valueForm.init(catalogTreeTable.root.data, itemForm.item)}"
+				        	update=":edit_item_form:edit_item_form" icon="ui-icon-search">
+				       		<f:setPropertyActionListener target="#{itemForm.item}" value="#{catalogTreeTable.selectedNode.data}" />
+				        </p:menuitem>
+				        <p:menuitem value="#{msg['item.copy']}" actionListener="#{catalogTreeTable.copyItem}" update="sections,section_menu" icon="ui-icon-close" />
+				        <p:menuitem value="#{msg.delete}" actionListener="#{catalogTreeTable.deleteItemNode}" update="sections" icon="ui-icon-close" />
+				    </p:contextMenu>
+				 
+					<p:treeTable id="sections" value="#{catalogTreeTable.root}" var="doc" selectionMode="single" selection="#{catalogTreeTable.selectedNode}" rendered="#{not empty catalogTreeTable.root}">
+					
+						<f:facet name="header">
+							<p:inplace editor="true">
+								<p:ajax event="save" listener="#{catalogTreeTable.edit(catalogTreeTable.root.data)}" update=":catalog_list_form" />
+				                <p:inputText value="#{catalogTreeTable.root.data.name}" />
+				            </p:inplace>
+				            <p:commandButton title="#{msg['catalog.add_section']}" action="#{valueForm.init(catalogTreeTable.root.data)}" process="@this" actionListener="#{sectionForm.init}"
+				            	update=":add_section_form:add_section_form,:edit_section_form:edit_section_form" oncomplete="addSectionDialog.show()" icon="ui-icon-plus" style="margin-left: 5px;" />
+				        </f:facet>
+
+						<p:column>
+							<f:facet name="header">#{msg['catalog.table.name']}</f:facet>
+							<h:outputText value="#{doc.name}" />
+						</p:column>
+			
+						<p:column>
+							<f:facet name="header">#{msg['catalog.table.type']}</f:facet>
+							<h:outputText value="#{doc.type}" />
+						</p:column>
+			
+						<p:column>
+							<f:facet name="header">#{msg['catalog.table.image']}</f:facet>
+							<h:outputText value="#{doc.image.mimeType}" />
+						</p:column>
+					</p:treeTable>
+				</h:form>
+				
+				<h:form>
+					<p:commandButton value="#{msg.export}" actionListener="#{jsonFileExportController.export(catalogTreeTable.root.data)}"
+						rendered="#{not empty catalogTreeTable.root}" style="margin-top: 5px;" ajax="false">
+						<p:fileDownload value="#{jsonFileExportController.file}"/>
+					</p:commandButton>
+				</h:form>
+			</p:layoutUnit>
+		</p:layout>
+			
+		<c:sectionForm id="add_section_form" widgetVar="addSectionDialog" header="#{msg['catalog.add_section']}" addForm="true" />
+		<c:sectionForm id="edit_section_form" widgetVar="editSectionDialog" header="#{msg['catalog.edit_section']}" addForm="false" />
+
+		<c:itemForm id="add_item_form" widgetVar="addItemDialog" header="#{msg['section.add_item']}" addForm="true" />
+		<c:itemForm id="edit_item_form" widgetVar="editItemDialog" header="#{msg['section.edit_item']}" addForm="false" />
+	</ui:define>
+</ui:composition>
+</html>
